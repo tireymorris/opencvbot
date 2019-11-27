@@ -15,7 +15,7 @@ ap.add_argument('-v', '--video', help='video file path')
 ap.add_argument('-a', '--min-area', type=int,
                 default=2000, help='minimum area size')
 ap.add_argument('-r', '--reset-interval', type=int,
-                default=96, help='frame interval between initial frame resets')
+                default=50, help='frame interval between initial frame resets')
 args = vars(ap.parse_args())
 
 if args.get('video', None) is None:
@@ -46,6 +46,7 @@ while True:
     if initial_frame is None or (frame_counter == reset_interval):
         initial_frame = gray
         frame_counter = 0
+        notified_during_interval = False
         continue
 
     # compute the absolute difference between the current frame and
