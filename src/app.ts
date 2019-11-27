@@ -38,7 +38,8 @@ bot.onText(/\/(help|commands|start)(.*)/, (msg: any) => {
 /help - display this message
 /subscribe - register chat with BrambleBot, obtain API endpoint for backend
 /toggle - turn motion detection on or off
-/fetch - request a single image from the backend
+/fetch - request a single frame from the backend
+/status - returns whether the server is fetching a frame and detecting motion
   `;
   bot.sendMessage(chatId, helpText);
 });
@@ -63,6 +64,20 @@ const toggleFetch = (chatId: string) => {
   return message;
 };
 
+const getStatus = (chatId: string) => {
+  const message = `
+Status for chatId ${chatId}: ${
+    fetchingOn[chatId] !== undefined && detectingMotion[chatId] !== undefined ? `
+\tFetching: ${fetchingOn[chatId]}
+\tDetecting Motion: ${detectingMotion[chatId]}` :
+      '\nError: make sure backend is pointing to node server'
+    }
+  `;
+  bot.sendMessage(chatId, message);
+  console.log(message);
+  return message;
+};
+
 bot.onText(/\/toggle(.*)/, (msg: any) => {
   const chatId = msg.chat.id;
   toggleMotionDetect(chatId);
@@ -71,6 +86,16 @@ bot.onText(/\/toggle(.*)/, (msg: any) => {
 bot.onText(/\/fetch(.*)/, (msg: any) => {
   const chatId = msg.chat.id;
   toggleFetch(chatId);
+});
+
+bot.onText(/\/status(.*)/, (msg: any) => {
+  const chatId = msg.chat.id;
+  getStatus(chatId);
+});
+
+app.get('/status', (req, res) => {
+  const message = getStatus(req.query.chatId);
+  res.send(message);
 });
 
 app.get('/toggle', (req, res) => {
