@@ -46,7 +46,8 @@ app.get('/toggle', (req, res) => {
 
 app.post('/motion', (req, res) => {
   if (!serverOn) {
-    throw new Error('Motion detection turned off');
+    res.statusCode = 500;
+    res.send('Motion detection is currently disabled');
   }
 
   const message = `Motion detected at ${new Date(Date.now()).toLocaleString('en-US')}`;
