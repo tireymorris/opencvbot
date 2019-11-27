@@ -19,7 +19,7 @@ bot.onText(/\/subscribe(.*)/, (msg: any) => {
   // of the message
 
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, `Affirmativo hombre - use '/motion?chatId=${chatId}' in your MotionEyeOS config.`);
+  bot.sendMessage(chatId, `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.`);
 });
 
 app.get('/motion', (req, res) => {
