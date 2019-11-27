@@ -1,9 +1,11 @@
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import TelegramBot from 'node-telegram-bot-api';
 
 dotenv.config();
 const app = express();
+app.use(bodyParser.raw());
 const port = process.env.PORT || 3001;
 const token = process.env.API_TOKEN;
 
@@ -22,9 +24,11 @@ bot.onText(/\/subscribe(.*)/, (msg: any) => {
   bot.sendMessage(chatId, `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.`);
 });
 
-app.get('/motion', (req, res) => {
+app.post('/motion', (req, res) => {
   const message = `Motion detected at ${new Date(Date.now()).toLocaleString('en-US')}`;
   const chatId = req.query.chatId;
+  const image = Buffer.from(req.body);
+
   res.send(message);
   console.log(message);
 
@@ -34,6 +38,10 @@ app.get('/motion', (req, res) => {
   }
 
   bot.sendMessage(chatId, message);
+
+  if (image) {
+    bot.sendPhoto(chatId, image);
+  }
 });
 
 app.listen(port, () => console.log(`App is listening on port ${port}`));

@@ -15,7 +15,7 @@ ap.add_argument('-v', '--video', help='video file path')
 ap.add_argument('-a', '--min-area', type=int,
                 default=2000, help='minimum area size')
 ap.add_argument('-r', '--reset-interval', type=int,
-                default=50, help='frame interval between initial frame resets')
+                default=5, help='frame interval between initial frame resets')
 args = vars(ap.parse_args())
 
 if args.get('video', None) is None:
@@ -63,9 +63,12 @@ while True:
 
     visible_shapes = list(filter(lambda c: cv2.contourArea(c)
                                  >= args['min_area'], cnts))
+
     if (len(visible_shapes) > 0 and not notified_during_interval):
         try:
-            requests.get(os.getenv('NODE_ENDPOINT'))
+            requests.post(os.getenv('NODE_ENDPOINT'),
+                          cv2.imencode('.jpg', frame)[1].tostring(),
+                          headers={'Content-Type': 'application/octet-stream'})
             notified_during_interval = True
         except requests.exceptions.ConnectionError:
             print('Motion detected, but could not hit node endpoint')
