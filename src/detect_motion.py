@@ -16,7 +16,7 @@ ap.add_argument('-v', '--video', help='video file path')
 ap.add_argument('-a', '--min-area', type=int,
                 default=1500, help='minimum area size')
 ap.add_argument('-m', '--motion-interval', type=int,
-                default=5, help='frame interval between initial frame resets')
+                default=2, help='frame interval between initial frame resets')
 ap.add_argument('-i', '--idle-interval', type=int,
                 default=5, help='frame interval between idle captures')
 args = vars(ap.parse_args())
@@ -62,14 +62,14 @@ while True:
                 uri=parsed_url)
 
             should_fetch_response = requests.get(
-                root_url + 'should_fetch?' + parsed_url.query, timeout=8)
+                root_url + 'should_fetch?' + parsed_url.query, timeout=2)
 
             if (should_fetch_response.text == 'true'):
                 requests.post(os.getenv('NODE_ENDPOINT')+'&idle=true',
                               cv2.imencode('.jpg', frame)[1].tostring(),
                               headers={
                                   'Content-Type': 'application/octet-stream'},
-                              timeout=8)
+                              timeout=5)
         except requests.exceptions.ConnectionError:
             print('Idle interval reached, but could not hit node endpoint')
         except:
@@ -95,7 +95,7 @@ while True:
             requests.post(os.getenv('NODE_ENDPOINT'),
                           cv2.imencode('.jpg', frame)[1].tostring(),
                           headers={'Content-Type': 'application/octet-stream'},
-                          timeout=8)
+                          timeout=5)
             motion_message_sent = True
         except requests.exceptions.ConnectionError:
             print('Motion detected, but could not hit node endpoint')
