@@ -24,9 +24,9 @@ if (!token) {
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/subscribe(.*)/, (msg: any) => {
-  const chatId = msg.chat.id;
+  const chatId: string = msg.chat.id;
   detectingMotion[chatId] = true;
-  fetchingOn[chatId] = false;
+  fetchingOn[chatId] = true;
   bot.sendMessage(chatId, `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.`);
 });
 

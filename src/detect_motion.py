@@ -14,7 +14,7 @@ load_dotenv()
 ap = argparse.ArgumentParser()
 ap.add_argument('-v', '--video', help='video file path')
 ap.add_argument('-a', '--min-area', type=int,
-                default=3000, help='minimum area size')
+                default=1500, help='minimum area size')
 ap.add_argument('-m', '--motion-interval', type=int,
                 default=5, help='frame interval between initial frame resets')
 ap.add_argument('-i', '--idle-interval', type=int,
@@ -62,7 +62,7 @@ while True:
                 uri=parsed_url)
 
             should_fetch_response = requests.get(
-                root_url + 'should_fetch' + parsed_url.query, timeout=8)
+                root_url + 'should_fetch?' + parsed_url.query, timeout=8)
 
             if (should_fetch_response.text == 'true'):
                 requests.post(os.getenv('NODE_ENDPOINT')+'&idle=true',
