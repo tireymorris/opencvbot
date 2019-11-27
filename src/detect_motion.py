@@ -54,6 +54,9 @@ while True:
         motion_message_sent = False
         continue
 
+    cv2.putText(frame, datetime.datetime.now().strftime('%A %d %B %Y %I:%M:%S%p'),
+                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+
     if (idle_counter == idle_interval):
         idle_counter = 0
         try:
@@ -109,9 +112,6 @@ while True:
             continue
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    cv2.putText(frame, datetime.datetime.now().strftime('%A %d %B %Y %I:%M:%S%p'),
-                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
     cv2.imshow('Security Feed', frame)
     cv2.imshow('Thresh', thresh)
