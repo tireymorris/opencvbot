@@ -27,7 +27,20 @@ bot.onText(/\/subscribe(.*)/, (msg: any) => {
   const chatId: string = msg.chat.id;
   detectingMotion[chatId] = true;
   fetchingOn[chatId] = true;
-  bot.sendMessage(chatId, `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.`);
+  bot.sendMessage(chatId,
+    `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.\n\tNOTE: Must POST image to this endpoint`,
+  );
+});
+
+bot.onText(/\/(help|commands|start)(.*)/, (msg: any) => {
+  const chatId: string = msg.chat.id;
+  const helpText = `
+/help - display this message
+/subscribe - register chat with BrambleBot, obtain API endpoint for backend
+/toggle - turn motion detection on or off
+/fetch - request a single image from the backend
+  `;
+  bot.sendMessage(chatId, helpText);
 });
 
 const toggleMotionDetect = (chatId: string) => {
