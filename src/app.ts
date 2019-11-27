@@ -11,8 +11,8 @@ app.use(bodyParser.raw());
 const port = process.env.PORT || 3001;
 const token = process.env.API_TOKEN;
 
-let detectingMotion = true;
-let fetchingOn = false;
+const detectingMotion = {};
+const fetchingOn = {};
 
 const getTimestamp = () => new Date(Date.now()).toLocaleString('en-US', { timeZone: "America/Chicago" });
 
@@ -25,13 +25,15 @@ const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/subscribe(.*)/, (msg: any) => {
   const chatId = msg.chat.id;
+  detectingMotion[chatId] = true;
+  fetchingOn[chatId] = false;
   bot.sendMessage(chatId, `Affirmativo hombre - use endpoint '/motion?chatId=${chatId}' to run motion detection code.`);
 });
 
 const toggleMotionDetect = (chatId: string) => {
-  const message = `Motion detection turned ${detectingMotion ? 'off' : 'on'} at ${getTimestamp()}`;
+  const message = `Motion detection turned ${detectingMotion[chatId] ? 'off' : 'on'} at ${getTimestamp()}`;
 
-  detectingMotion = !detectingMotion;
+  detectingMotion[chatId] = !detectingMotion[chatId];
 
   bot.sendMessage(chatId, message);
   console.log(message);
@@ -39,9 +41,9 @@ const toggleMotionDetect = (chatId: string) => {
 };
 
 const toggleFetch = (chatId: string) => {
-  const message = `${fetchingOn ? 'Canceling' : 'Starting'} fetch at ${getTimestamp()}`;
+  const message = `${fetchingOn[chatId] ? 'Canceling' : 'Starting'} fetch at ${getTimestamp()}`;
 
-  fetchingOn = !fetchingOn;
+  fetchingOn[chatId] = !fetchingOn[chatId];
 
   bot.sendMessage(chatId, message);
   console.log(message);
@@ -69,30 +71,30 @@ app.get('/fetch', (req, res) => {
 });
 
 app.get('/should_fetch', (req, res) => {
-  res.send(fetchingOn ? 'true' : 'false');
+  const chatId = req.query.chatId;
+  res.send(fetchingOn[chatId] ? 'true' : 'false');
 });
 
 app.post('/motion', (req, res) => {
-  if (!fetchingOn && !detectingMotion) {
-    res.statusCode = 500;
-    res.send('Motion detection is currently disabled');
-    return;
-  }
-
   const chatId = req.query.chatId;
-
   if (!chatId) {
     console.error('Chat ID query param not found.');
     return;
   }
 
+  if (!fetchingOn[chatId] && !detectingMotion[chatId]) {
+    res.statusCode = 500;
+    res.send('Motion detection is currently disabled');
+    return;
+  }
+
   const image = Buffer.from(req.body);
 
-  if (image && fetchingOn && req.query.idle) {
-    fetchingOn = false;
+  if (image && fetchingOn[chatId] && req.query.idle) {
+    fetchingOn[chatId] = false;
     bot.sendPhoto(chatId, image);
     return;
-  } else if (image && !fetchingOn && !req.query.idle) {
+  } else if (image && !fetchingOn[chatId] && !req.query.idle) {
     bot.sendPhoto(chatId, image);
   }
 
