@@ -3,3 +3,4 @@ numpy==1.17.4
 opencv-python==4.1.0.25
 python-dotenv==0.10.3
 requests==2.7.0
+tzlocal==2.0.0

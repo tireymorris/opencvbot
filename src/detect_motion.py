@@ -1,13 +1,14 @@
+from dotenv import load_dotenv
 from imutils.video import VideoStream
+from tzlocal import get_localzone
+from urllib.parse import urlparse
 import argparse
 import cv2
 import datetime
-from dotenv import load_dotenv
 import imutils
 import os
 import requests
 import time
-from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -54,7 +55,7 @@ while True:
         motion_message_sent = False
         continue
 
-    cv2.putText(frame, datetime.datetime.now().strftime('%A %d %B %Y %I:%M:%S%p'),
+    cv2.putText(frame, datetime.datetime.now().astimezone(get_localzone()).strftime('%A %d %B %Y %I:%M:%S%p'),
                 (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
     if (idle_counter == idle_interval):
