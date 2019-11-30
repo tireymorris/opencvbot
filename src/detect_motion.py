@@ -23,7 +23,7 @@ ap.add_argument('-i', '--idle-interval', type=int,
 args = vars(ap.parse_args())
 
 if args.get('video', None) is None:
-    vs = VideoStream(src=0, resolution=(640, 480), framerate=24).start()
+    vs = VideoStream(src=0, resolution=(1280, 720), framerate=24).start()
     time.sleep(2.0)
 else:
     vs = cv2.VideoCapture(args['video'])
@@ -107,7 +107,7 @@ while True:
             print('An unknown error ocurred')
     # compute the bounding box for the contour, draw it on the frame,
     # and update the text
-    for c in cnts:
+    for c in visible_shapes:
         # if the contour is too small, ignore it
         if cv2.contourArea(c) < args['min_area']:
             continue
